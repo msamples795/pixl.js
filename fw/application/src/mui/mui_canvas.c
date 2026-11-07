@@ -1,27 +1,6 @@
 #include "mui_canvas.h"
 
-#include <string.h>
-
-static uint8_t m_screen_shadow[MUI_SCREEN_SHADOW_SIZE];
-static bool m_screen_shadow_valid = false;
-
-void mui_canvas_flush(mui_canvas_t *p_canvas) {
-    u8g2_SendBuffer(p_canvas->fb);
-    uint8_t *buf = u8g2_GetBufferPtr(p_canvas->fb);
-    uint32_t size = 8u * u8g2_GetBufferTileHeight(p_canvas->fb) * u8g2_GetBufferTileWidth(p_canvas->fb);
-    if (size == MUI_SCREEN_SHADOW_SIZE) {
-        memcpy(m_screen_shadow, buf, MUI_SCREEN_SHADOW_SIZE);
-        m_screen_shadow_valid = true;
-    }
-}
-
-bool mui_screen_shadow_copy(uint8_t *dst) {
-    if (!m_screen_shadow_valid) {
-        return false;
-    }
-    memcpy(dst, m_screen_shadow, MUI_SCREEN_SHADOW_SIZE);
-    return true;
-}
+void mui_canvas_flush(mui_canvas_t *p_canvas) { u8g2_SendBuffer(p_canvas->fb); }
 
 void mui_canvas_clear(mui_canvas_t *p_canvas) { u8g2_ClearBuffer(p_canvas->fb); }
 

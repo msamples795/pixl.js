@@ -8,7 +8,6 @@
 #include "bat.h"
 #include "settings.h"
 #include "boards.h"
-#include "mui_canvas.h"
 #include "mui_core.h"
 #include <string.h>
 #include "ble_main.h"
@@ -80,9 +79,11 @@ void df_proto_handler_info_battery(df_event_t *evt) {
 #else
 #define PIXL_SCREEN_ROTATION 0
 #endif
-#define PIXL_SCREEN_BYTES (MUI_SCREEN_SHADOW_SIZE + 4)
+#define PIXL_SCREEN_FB_BYTES 1024
+#define PIXL_SCREEN_BYTES (PIXL_SCREEN_FB_BYTES + 4)
 
-static uint8_t m_screen[PIXL_SCREEN_BYTES];
+/* No copy of the frame is kept (RAM is nearly full): chunks are read straight from the u8g2 buffer,
+ * which holds the last frame drawn; the display is redrawn from the main loop between chunks at most. */
 static uint16_t m_screen_off;
 static uint16_t m_screen_chunk;
 
@@ -91,12 +92,13 @@ static void screen_send_chunk(void) {
         return;
     }
     df_frame_t out;
-    uint16_t n = PIXL_SCREEN_BYTES - m_screen_off;
-    if (n > sizeof(out.data)) {
-        n = sizeof(out.data);
+    const uint8_t *fb = u8g2_GetBufferPtr(&mui()->u8g2);
+    const uint8_t head[4] = {128, 64, PIXL_SCREEN_ROTATION, 0};
+    uint16_t n = 0;
+    while (n < sizeof(out.data) && m_screen_off < PIXL_SCREEN_BYTES) {
+        out.data[n++] = m_screen_off < 4 ? head[m_screen_off] : fb[m_screen_off - 4];
+        m_screen_off++;
     }
-    memcpy(out.data, m_screen + m_screen_off, n);
-    m_screen_off += n;
     uint16_t chunk = m_screen_chunk++;
     if (m_screen_off < PIXL_SCREEN_BYTES) {
         chunk |= 0x8000;
@@ -107,13 +109,6 @@ static void screen_send_chunk(void) {
 
 void df_proto_handler_info_screen(df_event_t *evt) {
     if (evt->type == DF_EVENT_DATA_RECEVIED) {
-        m_screen[0] = 128;
-        m_screen[1] = 64;
-        m_screen[2] = PIXL_SCREEN_ROTATION;
-        m_screen[3] = 0;
-        if (!mui_screen_shadow_copy(m_screen + 4)) {
-            memcpy(m_screen + 4, u8g2_GetBufferPtr(&mui()->u8g2), MUI_SCREEN_SHADOW_SIZE);
-        }
         m_screen_off = 0;
         m_screen_chunk = 0;
         screen_send_chunk();
