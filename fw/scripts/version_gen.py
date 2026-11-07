@@ -35,7 +35,10 @@ class GitVersion:
         branch_num = self._exec_git("rev-list --count HEAD") or "n/a"
 
         ref_type = os.environ.get("GITHUB_REF_TYPE", None)
-        if ref_type == "tag":
+        if os.environ.get("PIXL_VERSION"):
+            # explicit version for custom builds (Pixl Manager)
+            version = os.environ["PIXL_VERSION"]
+        elif ref_type == "tag":
             version = os.environ.get("GITHUB_REF_NAME", None)
         elif ref_type == "branch":
             version = "b" + os.environ.get("GITHUB_RUN_NUMBER", None)
