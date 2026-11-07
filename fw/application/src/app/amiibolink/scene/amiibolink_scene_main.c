@@ -190,6 +190,10 @@ void amiibolink_scene_main_on_enter(void *user_data) {
 
     // enable ble
     ble_init();
+    if (ble_is_connected()) { /* Pixl Manager link kept from BLE File Transfer: end it first */
+        ble_disable();
+        ble_disconnect_wait(2000);
+    }
     uint8_t device_mode;
     if (p_settings->amiibo_link_ver == BLE_AMIIBOLINK_VER_V2) {
         device_mode = BLE_DEVICE_MODE_AMIIBOLINK_V2;

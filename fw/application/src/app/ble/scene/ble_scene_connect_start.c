@@ -11,7 +11,7 @@
 void ble_scene_connect_status_view_event_cb(ble_status_view_event_t event, ble_status_view_t *p_view){
     app_ble_t *app = p_view->user_data;
     if (event == BLE_STATUS_VIEW_BLE_DISABLE) {
-        ble_disable();
+        ble_release(); /* Pixl Manager: keep a connected client */
         mini_app_launcher_kill(mini_app_launcher(), MINI_APP_ID_BLE);
     } else if (event == BLE_STATUS_VIEW_EVENT_UPDATE) {
         // NOOP
@@ -24,8 +24,13 @@ void ble_scene_connect_start_on_enter(void *user_data) {
     app_ble_t *app = user_data;
 
     ble_init();
-    ble_device_mode_prepare(BLE_DEVICE_MODE_PIXLJS);
-    ble_adv_start();
+    if (ble_is_connected()) {
+        /* link kept from an earlier visit: already in Pixl.js mode; advertise again after it ends */
+        ble_adv_resume_on_disconnect();
+    } else {
+        ble_device_mode_prepare(BLE_DEVICE_MODE_PIXLJS);
+        ble_adv_start();
+    }
 
     ble_nus_set_handler(ble_on_received_data, ble_on_transmit_ready);
 

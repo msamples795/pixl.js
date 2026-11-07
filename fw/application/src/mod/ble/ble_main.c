@@ -86,6 +86,7 @@
 #include "nrf_pwr_mgmt.h"
 
 #include "app_scheduler.h"
+#include "nrf_delay.h"
 
 #define APP_BLE_CONN_CFG_TAG 1 /**< A tag identifying the SoftDevice BLE configuration. */
 
@@ -578,6 +579,27 @@ void ble_disable() {
     m_advertising.adv_modes_config.ble_adv_on_disconnect_disabled = true;
     if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
         sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+    }
+}
+
+bool ble_is_connected(void) { return m_conn_handle != BLE_CONN_HANDLE_INVALID; }
+
+void ble_adv_resume_on_disconnect(void) { m_advertising.adv_modes_config.ble_adv_on_disconnect_disabled = false; }
+
+/* Stop advertising but keep a current connection; once it ends, do not advertise again. */
+void ble_release(void) {
+    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
+        ble_disable();
+        return;
+    }
+    m_advertising.adv_modes_config.ble_adv_on_disconnect_disabled = true;
+}
+
+/* Wait (main context; SoftDevice events arrive by interrupt) until a disconnect has completed. */
+void ble_disconnect_wait(uint32_t timeout_ms) {
+    while (*(volatile uint16_t *)&m_conn_handle != BLE_CONN_HANDLE_INVALID && timeout_ms > 0) {
+        nrf_delay_ms(1);
+        timeout_ms--;
     }
 }
 

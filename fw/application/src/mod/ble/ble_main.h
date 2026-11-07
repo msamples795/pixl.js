@@ -8,6 +8,10 @@
 #ifndef BLE_H_
 #define BLE_H_
 
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
+
 //#define DEVICE_NAME "amiibolink" /**< Name of device. Will be included in the advertising data. */
 
 #define MAX_MTU_DAT_SIZE (NRF_SDH_BLE_GATT_MAX_MTU_SIZE-3)
@@ -28,6 +32,11 @@ void ble_init(void);
 void ble_device_mode_prepare(ble_device_mode_t mode);
 void ble_adv_start(void);
 void ble_disable();
+/* Pixl Manager */
+bool ble_is_connected(void);
+void ble_release(void);
+void ble_disconnect_wait(uint32_t timeout_ms);
+void ble_adv_resume_on_disconnect(void);
 
 
 void ble_nus_set_handler(nus_rx_data_handler_t rx_data_handler, nus_tx_ready_handler_t tx_ready_handler);
