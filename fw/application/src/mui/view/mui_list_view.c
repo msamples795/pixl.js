@@ -233,6 +233,23 @@ static void mui_list_view_on_input(mui_view_t *p_view, mui_input_event_t *event)
             mui_list_view_start_text_anim(p_mui_list_view);
             break;
 
+        case INPUT_KEY_BACK:
+            if (p_mui_list_view->selected_cb && event->type == INPUT_TYPE_SHORT) {
+                const uint16_t back_icons[2] = {0xe069, 0xe1f0}; /* back, main menu */
+                uint32_t n = mui_list_item_array_size(p_mui_list_view->items);
+                for (uint32_t k = 0; k < 2; k++) {
+                    for (uint32_t i = 0; i < n; i++) {
+                        mui_list_item_t *it = mui_list_item_array_get(p_mui_list_view->items, i);
+                        if (it->icon == back_icons[k]) {
+                            p_mui_list_view->focus_index = i;
+                            p_mui_list_view->selected_cb(MUI_LIST_VIEW_EVENT_SELECTED, p_mui_list_view, it);
+                            return;
+                        }
+                    }
+                }
+            }
+            break;
+
         case INPUT_KEY_CENTER:
             if (p_mui_list_view->selected_cb) {
                 if (event->type == INPUT_TYPE_SHORT) {

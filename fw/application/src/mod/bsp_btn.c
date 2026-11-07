@@ -27,6 +27,9 @@ static const app_button_cfg_t app_buttons[BUTTONS_NUMBER] = {
     {BSP_BUTTON_0, false, BUTTON_PULL, bsp_button_event_handler},
     {BSP_BUTTON_1, false, BUTTON_PULL, bsp_button_event_handler},
     {BSP_BUTTON_2, false, BUTTON_PULL, bsp_button_event_handler},
+#if BUTTONS_NUMBER > 3
+    {BSP_BUTTON_3, false, BUTTON_PULL, bsp_button_event_handler},
+#endif
 };
 
 static bsp_btn_t m_bsp_btns[BUTTONS_NUMBER] = {0};
