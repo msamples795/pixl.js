@@ -19,6 +19,10 @@ typedef struct {
 } mui_rect_t;
 
 void mui_canvas_flush(mui_canvas_t *p_canvas);
+
+/* Pixl Manager: copy of the last full frame sent to the display (128x64, 1 bpp). */
+#define MUI_SCREEN_SHADOW_SIZE 1024
+bool mui_screen_shadow_copy(uint8_t *dst);
 void mui_canvas_clear(mui_canvas_t *p_canvas);
 
 uint8_t mui_canvas_get_utf8_bytes(const char *p);

@@ -7,7 +7,11 @@
 /** info proto command defines */
 typedef enum {
     DF_PROTO_CMD_INFO_VERSION_INFO = 0x01,
-    DF_PROTO_CMD_INFO_ENTER_DFU = 0x02
+    DF_PROTO_CMD_INFO_ENTER_DFU = 0x02,
+    /* Pixl Manager additions */
+    DF_PROTO_CMD_INFO_REBOOT = 0x0A,
+    DF_PROTO_CMD_INFO_BATTERY = 0x0B,
+    DF_PROTO_CMD_INFO_SCREEN = 0x0C
 } df_proto_cmd_info_t;
 
 

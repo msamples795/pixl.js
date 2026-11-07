@@ -205,7 +205,10 @@ void mui_u8g2_init(u8g2_t *p_u8g2) {
 #endif
 
 #ifdef OLED_SCREEN
-    u8g2_Setup_sh1106_128x64_noname_f(p_u8g2, U8G2_R0, u8x8_HW_com_spi_nrf52832, u8g2_nrf_gpio_and_delay_spi_cb);
+#ifndef PIXL_OLED_ROTATION
+#define PIXL_OLED_ROTATION U8G2_R2 /* this unit's panel is mounted upside down */
+#endif
+    u8g2_Setup_sh1106_128x64_noname_f(p_u8g2, PIXL_OLED_ROTATION, u8x8_HW_com_spi_nrf52832, u8g2_nrf_gpio_and_delay_spi_cb);
     u8g2_InitDisplay(p_u8g2);
 
     settings_data_t *p_settings = settings_get_data();

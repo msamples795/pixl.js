@@ -13,7 +13,7 @@ jobs:
   build:
     strategy:
       matrix:
-        board: ["LCD", "OLED"]
+        board: ["OLED"]  # Pixl Manager build: this unit has the OLED screen
     runs-on: ubuntu-latest
     container: solosky/nrf52-sdk:latest
     steps:
